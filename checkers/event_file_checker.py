@@ -63,6 +63,16 @@ def colorAttributeCheck(j, name):
     '''Checks that the object is a color. Actually only checking it's a string for the moment'''
     genericTypeCheck(j, name, str)
 
+def dparamsAttributeCheck(j, name):
+    '''Checks that the object is dparams.'''
+    # dparams attribute should be a list
+    floatListCheck(j, name)
+    # check number of entries is a multiple of 3
+    if len(j) != 5:
+        raise PhoenixFormatError(
+            "Expected the 'dparams' attribute to contain d0,z0,phi0,qOverP. Not the case for %s (found %d elements)"
+            % (name, len(j)))
+
 def floatListCheck(j, name, nitems=-1):
     '''Checks that the object is a float list and that the number of items is the number expected if nitems >= 0'''
     # check we have a list
