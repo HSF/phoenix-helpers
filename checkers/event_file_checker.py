@@ -38,7 +38,7 @@ def genericCheck(j, d, objName, objType):
     for key in d:
         isOpt, checker = d[key]
         # check presence of mandatory entries
-        if not isOpt and not key in j:
+        if not isOpt and key not in j:
             raise PhoenixFormatError("Expected a '%s' attribute in %s" % (key, objName))
         if key in j:
             checker(j[key], objName + ", attribute '" + key + "'")
@@ -92,22 +92,22 @@ def hitTypeCheck(j, name):
         raise PhoenixFormatError(
             'Invalid hit type "%s" in %s. Valid values are Point, Line and Box' % (j, name))    
     
-def posAttributeCheck(position, objName):
-    '''Check that the object is a valid pos attibute, so a list of floats with number of items being a multiple of 3'''
+def posAttributeCheck(positions, name):
+    '''Check that the object is a valid pos attibute, so a list of floats triplets'''
     # pos attribute should be a list
-    floatListCheck(position, objName)
-    # check number of entries is a multiple of 3
-    if len(position) % 3 != 0:
-        raise PhoenixFormatError(
-            "Expected the 'pos' attribute to contain triplets of coordinates. Not the case for %s (found %d elements)"
-            % (objName, len(position)))
+    genericTypeCheck(positions, name, list)
+    # each item should be a triplet of floats
+    n = 0
+    for pos in positions:
+        floatListCheck(pos, name + ", item %d" % n, 3)
+        n += 1
         
 def tracksCheck(data_name, data):
     '''Check that the object is a valid Tracks entry'''
     entries = {
         'pos' : (False, posAttributeCheck),
         'color' : (True, colorAttributeCheck),
-        'dparams' : (True, dparamsAttributeCheck),
+        'dparams' : (True, lambda j, n : floatListCheck(j, n, 5)),
         'd0' : (True, floatCheck),
         'z0' : (True, floatCheck),
         'phi' : (True, floatCheck),
